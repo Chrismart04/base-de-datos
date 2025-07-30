@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # SQL Server Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./:/workspace
+    restart: unless-stopped
+    networks:
+      - db_network
+
+  # Oracle Database
+  oracle:
+    image: container-registry.oracle.com/database/express:21.3.0-xe
+    container_name: oracle_db
+    environment:
+      - ORACLE_PWD=YourStrong@Passw0rd
+      - ORACLE_CHARACTERSET=AL32UTF8
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+      - ./:/workspace
+    restart: unless-stopped
+    networks:
+      - db_network
+    shm_size: 1gb
+
+volumes:
+  sqlserver_data:
+    driver: local
+  oracle_data:
+    driver: local
+
+networks:
+  db_network:
+    driver: bridge
